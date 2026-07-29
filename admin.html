@@ -515,10 +515,10 @@ function updateClientTotals(){
   var rows=approved.map(p=>{
     var shipments=allShipments.filter(s=>s.phone===p.phone);
     if(!shipments.length) return '';
-    var totalRev=shipments.reduce((a,s)=>a+(parseFloat(s.price)||0),0);
-    var totalClient=shipments.reduce((a,s)=>a+(parseFloat(s.client_amount)||0),0);
-    var totalShipping=totalRev-totalClient;
-    var totalPaid=shipments.filter(s=>s.payment_status==='تم الدفع').reduce((a,s)=>a+(parseFloat(s.client_amount)||0),0);
+        var totalRev=shipments.reduce((a,s)=>a+(parseFloat(s.price)||0)+(parseFloat(s.shipping_cost)||0),0);
+    var totalClient=shipments.reduce((a,s)=>a+(parseFloat(s.price)||0),0);
+    var totalShipping=shipments.reduce((a,s)=>a+(parseFloat(s.shipping_cost)||0),0);
+    var totalPaid=shipments.filter(s=>s.payment_status==='تم الدفع').reduce((a,s)=>a+(parseFloat(s.price)||0),0);
     var remaining=totalClient-totalPaid;
     return `<tr style="border-bottom:1px solid rgba(255,255,255,.04)">
       <td style="padding:.6rem;font-weight:700;color:var(--white)">${p.full_name}</td>
@@ -565,10 +565,10 @@ function updateStats(){
   document.getElementById('total-count').textContent=allShipments.length;
   // تطبيق فلتر التاريخ على الإحصائيات المالية
   var filtered=filterByDate(allShipments);
-  var rev=filtered.reduce((a,s)=>a+(parseFloat(s.price)||0)+(parseFloat(s.shipping_cost)||0),0);
+    var rev=filtered.reduce((a,s)=>a+(parseFloat(s.price)||0)+(parseFloat(s.shipping_cost)||0),0);
   var clientsTotal=filtered.reduce((a,s)=>a+(parseFloat(s.price)||0),0);
   var profit=filtered.reduce((a,s)=>a+(parseFloat(s.shipping_cost)||0),0);
-  var paid=filtered.filter(s=>s.payment_status==='تم الدفع').reduce((a,s)=>a+(parseFloat(s.client_amount)||0),0);
+  var paid=filtered.filter(s=>s.payment_status==='تم الدفع').reduce((a,s)=>a+(parseFloat(s.price)||0),0);
   var unpaid=clientsTotal-paid;
   document.getElementById('s-revenue').textContent=rev.toLocaleString('ar-EG');
   document.getElementById('s-clients-total').textContent=clientsTotal.toLocaleString('ar-EG');

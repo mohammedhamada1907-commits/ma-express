@@ -871,8 +871,8 @@ function updateBalance(){
     if(balFilter==='pick'&&datePick) return d.toISOString().slice(0,10)===datePick;
     return true;
   });
-  var total=filtered.reduce((a,s)=>a+(parseFloat(s.client_amount)||0),0);
-  var paid=filtered.filter(s=>s.payment_status==='تم الدفع').reduce((a,s)=>a+(parseFloat(s.client_amount)||0),0);
+  var total=filtered.reduce((a,s)=>a+(parseFloat(s.price)||0),0);
+  var paid=filtered.filter(s=>s.payment_status==='تم الدفع').reduce((a,s)=>a+(parseFloat(s.price)||0),0);
   document.getElementById('bal-total').textContent=total.toLocaleString('ar-EG');
   document.getElementById('bal-paid').textContent=paid.toLocaleString('ar-EG');
   document.getElementById('bal-remaining').textContent=(total-paid).toLocaleString('ar-EG');
