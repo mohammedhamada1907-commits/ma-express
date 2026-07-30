@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>M&A Express — لوحة التحكم</title>
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+<style id="print-styles">
+@media print {
+  body > *:not(#waybill-print-area) { display: none !important; }
+  #waybill-print-area { display: block !important; }
+  @page { size: A6 portrait; margin: 0; }
+}
+#waybill-print-area { display: none; }
+</style>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "43a83aaa-d66a-453c-9c7b-2f9e485eea41",
+    });
+  });
+</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--black:#0a0a0a;--dark:#111;--card:#161616;--gold:#C9A84C;--gold-lt:#E2C472;--silver:#C0C0C0;--white:#f5f5f5;--muted:#888;--red:#c0392b}
+html,body{min-height:100vh;background:var(--black);color:var(--white);font-family:'Cairo',sans-serif}
+#login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem}
+.login-box{background:var(--card);border:1px solid rgba(201,168,76,.2);width:100%;max-width:360px;padding:2.5rem;text-align:center}
+.login-box .logo{font-size:1.8rem;font-weight:900;color:var(--gold);margin-bottom:.3rem}
+.login-box .logo span{color:var(--silver)}
+.login-box h2{font-size:1rem;color:var(--muted);font-weight:400;margin-bottom:2rem}
+.ff{display:flex;flex-direction:column;gap:.4rem;text-align:right;margin-bottom:1rem}
+.ff label{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.pass-wrap{position:relative}
+.pass-wrap input{width:100%;padding-left:2.8rem}
+.pass-toggle{position:absolute;left:.8rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);font-size:1rem}
+.pass-toggle:hover{color:var(--gold)}
+input,select{background:#0f0f0f;border:1px solid rgba(201,168,76,.2);color:var(--white);padding:.78rem 1rem;font-family:'Cairo',sans-serif;font-size:.9rem;outline:none;transition:border-color .25s;width:100%}
+input:focus,select:focus{border-color:var(--gold)}
+select option{background:var(--card)}
+.btn-gold{background:var(--gold);color:var(--black);border:none;cursor:pointer;padding:.85rem;font-family:'Cairo',sans-serif;font-size:.95rem;font-weight:700;width:100%;transition:background .25s;margin-top:.5rem}
+.btn-gold:hover{background:var(--gold-lt)}
+.err-msg{color:var(--red);font-size:.82rem;margin-top:.5rem;min-height:1.2rem}
+#dash-page{display:none;flex-direction:column;min-height:100vh}
+.top-nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 4vw;background:rgba(10,10,10,.95);border-bottom:1px solid rgba(201,168,76,.12);position:sticky;top:0;z-index:10;flex-wrap:wrap;gap:.8rem}
+.nav-logo{font-size:1.2rem;font-weight:900;color:var(--gold)}
+.nav-logo span{color:var(--silver)}
+.btn-sm{background:transparent;color:var(--muted);border:1px solid rgba(192,192,192,.2);cursor:pointer;padding:.4rem .9rem;font-family:'Cairo',sans-serif;font-size:.75rem;font-weight:600;transition:border-color .25s,color .25s}
+.btn-sm:hover{border-color:var(--gold);color:var(--gold)}
+.btn-danger{border-color:rgba(192,48,43,.4);color:#e05}
+.btn-danger:hover{border-color:var(--red);color:var(--red)}
+.dash-body{padding:2rem 4vw;max-width:1100px;margin:0 auto;width:100%}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:1rem;margin-bottom:2rem}
+.stat-card{background:var(--card);border:1px solid rgba(201,168,76,.12);padding:1.2rem;text-align:center}
+.stat-card .num{font-size:1.8rem;font-weight:900;color:var(--gold);line-height:1}
+.stat-card .lbl{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:.3rem}
+.filters-section{background:var(--card);border:1px solid rgba(201,168,76,.1);padding:1.2rem;margin-bottom:1.5rem}
+.filters-section h4{font-size:.8rem;color:var(--gold);letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem}
+.filter-row{display:flex;gap:.8rem;flex-wrap:wrap;align-items:center;margin-bottom:.8rem}
+.filter-row:last-child{margin-bottom:0}
+.filter-row span{font-size:.78rem;color:var(--muted);white-space:nowrap}
+.fbtn{background:transparent;color:var(--muted);border:1px solid rgba(192,192,192,.15);cursor:pointer;padding:.35rem .8rem;font-family:'Cairo',sans-serif;font-size:.75rem;font-weight:600;transition:all .2s;white-space:nowrap}
+.fbtn:hover,.fbtn.active{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,.05)}
+.search-input{background:#0f0f0f;border:1px solid rgba(201,168,76,.2);color:var(--white);padding:.4rem .8rem;font-family:'Cairo',sans-serif;font-size:.8rem;outline:none;transition:border-color .25s;flex:1;min-width:180px;width:auto}
+.search-input:focus{border-color:var(--gold)}
+.search-input::placeholder{color:#555}
+.date-input{background:#0f0f0f;border:1px solid rgba(201,168,76,.2);color:var(--white);padding:.35rem .7rem;font-family:'Cairo',sans-serif;font-size:.78rem;outline:none;transition:border-color .25s;width:auto}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.8rem}
+thead tr{border-bottom:1px solid rgba(201,168,76,.2)}
+th{padding:.7rem .6rem;text-align:right;color:var(--gold);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;font-weight:700;white-space:nowrap}
+td{padding:.75rem .6rem;border-bottom:1px solid rgba(255,255,255,.04);color:var(--white);vertical-align:middle}
+tr:hover td{background:rgba(201,168,76,.03)}
+.tn{font-weight:700;color:var(--gold);white-space:nowrap;font-size:.82rem}
+.addr{font-size:.72rem;color:var(--muted);max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.client-name{font-size:.82rem;color:var(--silver);font-weight:600}
+.status-select{background:#0f0f0f;border:1px solid rgba(201,168,76,.2);color:var(--white);padding:.3rem .4rem;font-family:'Cairo',sans-serif;font-size:.72rem;outline:none;cursor:pointer;width:auto}
+.status-select option{background:var(--card)}
+.num-input{padding:.3rem .4rem;font-size:.75rem;background:#0f0f0f;border:1px solid rgba(201,168,76,.2);color:var(--white);font-family:'Cairo',sans-serif;outline:none;width:75px}
+.num-input:focus{border-color:var(--gold)}
+.text-input{padding:.3rem .4rem;font-size:.72rem;background:#0f0f0f;border:1px solid rgba(201,168,76,.15);color:var(--white);font-family:'Cairo',sans-serif;outline:none;width:100px}
+.text-input:focus{border-color:var(--gold)}
+.saved-flash{color:var(--gold);font-size:.7rem;opacity:0;transition:opacity .3s;white-space:nowrap}
+.saved-flash.show{opacity:1}
+.no-data{text-align:center;color:var(--muted);padding:3rem;font-size:.9rem}
+@media(max-width:600px){th,td{padding:.5rem .4rem}}
+</style>
+</head>
+<body>
+
+<div id="login-page">
+  <div class="login-box">
+    <div class="logo">M<span>&amp;</span>A <span>EXPRESS</span></div>
+    <h2>لوحة تحكم المسؤول</h2>
+    <div class="ff">
+      <label>كلمة السر السرية</label>
+      <div class="pass-wrap">
+        <input type="password" id="admin-pass" placeholder="••••••••••" onkeydown="if(event.key==='Enter')doAdminLogin()"/>
+        <button class="pass-toggle" type="button" onclick="togglePass()">👁️</button>
+      </div>
+    </div>
+    <div class="err-msg" id="login-err"></div>
+    <button class="btn-gold" onclick="doAdminLogin()">دخول</button>
+  </div>
+</div>
+
+<div id="dash-page">
+  <nav class="top-nav">
+    <div class="nav-logo">M<span>&amp;</span>A <span>EXPRESS</span> <span style="font-size:.72rem;color:var(--muted);font-weight:400">— المسؤول</span></div>
+    <div style="display:flex;gap:.8rem;align-items:center">
+      <span style="font-size:.8rem;color:var(--muted)">إجمالي: <strong id="total-count" style="color:var(--gold)">0</strong></span>
+      <button class="btn-sm" onclick="loadAll()">🔄 تحديث</button>
+      <button class="btn-sm btn-danger" onclick="adminLogout()">خروج</button>
+    </div>
+  </nav>
+
+  <div class="dash-body">
+    <!-- الشكاوى -->
+    <div id="complaints-section" style="display:none;background:var(--card);border:1px solid rgba(192,48,43,.25);padding:1.4rem;margin-bottom:2rem">
+      <h4 style="font-size:.9rem;font-weight:700;color:#e05;margin-bottom:1rem">📢 الشكاوى <span id="complaints-count" style="font-size:.75rem;color:var(--muted)"></span></h4>
+      <div id="complaints-list"></div>
+    </div>
+
+    <!-- توتال حساب كل عميل -->
+    <div id="client-totals" style="display:none;background:var(--card);border:1px solid rgba(201,168,76,.15);padding:1.4rem;margin-bottom:1rem">
+      <h4 style="font-size:.85rem;font-weight:700;color:var(--gold);margin-bottom:1rem">💰 ملخص حسابات العملاء</h4>
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:.8rem">
+          <thead>
+            <tr style="border-bottom:1px solid rgba(201,168,76,.2)">
+              <th style="padding:.6rem;text-align:right;color:var(--gold);font-size:.7rem">العميل</th>
+              <th style="padding:.6rem;text-align:right;color:var(--gold);font-size:.7rem">عدد الشحنات</th>
+              <th style="padding:.6rem;text-align:right;color:var(--gold);font-size:.7rem">إجمالي الإيراد (ج)</th>
+              <th style="padding:.6rem;text-align:right;color:var(--gold);font-size:.7rem">إجمالي تكلفة الشحن (ج)</th>
+              <th style="padding:.6rem;text-align:right;color:var(--gold);font-size:.7rem">نصيب العميل (ج)</th>
+              <th style="padding:.6rem;text-align:right;color:var(--gold);font-size:.7rem">تم دفعه (ج)</th>
+              <th style="padding:.6rem;text-align:right;color:#e05;font-size:.7rem">متبقي (ج)</th>
+            </tr>
+          </thead>
+          <tbody id="client-totals-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- تحويلات للعملاء -->
+    <div style="background:var(--card);border:1px solid rgba(39,174,96,.2);padding:1.4rem;margin-bottom:2rem">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem">
+        <h4 style="font-size:.85rem;font-weight:700;color:#27ae60">💸 إرسال تحويل لعميل</h4>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:.8rem">
+        <div class="ff" style="margin:0">
+          <label>اختر العميل</label>
+          <select id="tr-client" style="background:#0f0f0f;border:1px solid rgba(201,168,76,.2);color:var(--white);padding:.65rem .8rem;font-family:'Cairo',sans-serif;font-size:.82rem;outline:none;width:100%">
+            <option value="">اختر...</option>
+          </select>
+        </div>
+        <div class="ff" style="margin:0">
+          <label>المبلغ (ج)</label>
+          <input type="number" id="tr-amount" placeholder="مثال: 500" min="0" step="1" style="background:#0f0f0f;border:1px solid rgba(201,168,76,.2);color:var(--white);padding:.65rem .8rem;font-family:'Cairo',sans-serif;font-size:.82rem;outline:none;width:100%"/>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:.8rem">
+        <div class="ff" style="margin:0">
+          <label>التاريخ</label>
+          <input type="date" id="tr-date" style="background:#0f0f0f;border:1px solid rgba(201,168,76,.2);color:var(--white);padding:.65rem .8rem;font-family:'Cairo',sans-serif;font-size:.82rem;outline:none;width:100%"/>
+        </div>
+        <div class="ff" style="margin:0">
+          <label>ملاحظات (اختياري)</label>
+          <input type="text" id="tr-notes" placeholder="مثال: تحويل فودافون كاش" style="background:#0f0f0f;border:1px solid rgba(201,168,76,.2);color:var(--white);padding:.65rem .8rem;font-family:'Cairo',sans-serif;font-size:.82rem;outline:none;width:100%"/>
+        </div>
+      </div>
+      <div class="ff" style="margin-bottom:.8rem">
+        <label>صورة إيصال التحويل (اختياري)</label>
+        <input type="file" id="tr-image" accept="image/*" style="background:#0f0f0f;border:1px solid rgba(201,168,76,.2);color:var(--white);padding:.5rem .8rem;font-family:'Cairo',sans-serif;font-size:.8rem;width:100%"/>
+      </div>
+      <button onclick="sendTransfer()" style="background:#27ae60;color:#fff;border:none;cursor:pointer;padding:.7rem 1.5rem;font-family:'Cairo',sans-serif;font-size:.88rem;font-weight:700;transition:background .25s">💸 إرسال التحويل</button>
+      <div class="auth-msg" id="tr-msg" style="margin-top:.5rem"></div>
+    </div>
+
+    <!-- طلبات الانضمام -->
+    <div id="pending-section" style="display:none;background:var(--card);border:1px solid rgba(201,168,76,.2);padding:1.4rem;margin-bottom:2rem">
+      <h4 style="font-size:.9rem;font-weight:700;color:var(--gold);margin-bottom:1rem">🔔 طلبات انضمام جديدة</h4>
+      <div id="pending-list"></div>
+    </div>
+
+    <!-- Stats -->
+    <div style="margin-bottom:.6rem;font-size:.72rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase">📦 الشحنات</div>
+    <div class="stats" style="margin-bottom:1rem">
+      <div class="stat-card"><div class="num" id="s-all">0</div><div class="lbl">إجمالي</div></div>
+      <div class="stat-card"><div class="num" id="s-new" style="color:#9b59b6">0</div><div class="lbl">جديد</div></div>
+      <div class="stat-card"><div class="num" id="s-prep" style="color:#e67e22">0</div><div class="lbl">جاري التجهيز</div></div>
+      <div class="stat-card"><div class="num" id="s-way" style="color:#3498db">0</div><div class="lbl">خرج مع المندوب</div></div>
+      <div class="stat-card"><div class="num" id="s-done" style="color:#27ae60">0</div><div class="lbl">تم التسليم</div></div>
+      <div class="stat-card"><div class="num" id="s-rejected" style="color:#e74c3c">0</div><div class="lbl">رفض / لم يرد</div></div>
+      <div class="stat-card"><div class="num" id="s-return" style="color:#8e44ad">0</div><div class="lbl">مرتجع</div></div>
+    </div>
+
+    <!-- فلتر الإحصائيات المالية -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem;flex-wrap:wrap;gap:.5rem">
+      <div style="font-size:.72rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase">💰 المالية</div>
+      <div style="display:flex;gap:.4rem">
+        <button class="fbtn active" id="fin-all" onclick="setFinFilter('all',this)">الكل</button>
+        <button class="fbtn" id="fin-today" onclick="setFinFilter('today',this)">اليوم</button>
+        <button class="fbtn" id="fin-week" onclick="setFinFilter('week',this)">الأسبوع</button>
+        <button class="fbtn" id="fin-month" onclick="setFinFilter('month',this)">الشهر</button>
+        <input class="date-input" type="date" id="fin-date" onchange="setFinFilter('pick',null)" style="font-size:.7rem;padding:.25rem .5rem"/>
+      </div>
+    </div>
+    <div class="stats" style="margin-bottom:1rem">
+      <div class="stat-card" style="border-color:rgba(201,168,76,.3)">
+        <div class="num" id="s-revenue" style="font-size:1.4rem">0</div>
+        <div class="lbl">إجمالي الإيرادات (ج)</div>
+      </div>
+      <div class="stat-card" style="border-color:rgba(192,48,43,.3)">
+        <div class="num" id="s-clients-total" style="font-size:1.4rem;color:#e05">0</div>
+        <div class="lbl">نصيب العملاء (ج)</div>
+      </div>
+      <div class="stat-card" style="border-color:rgba(39,174,96,.4);background:rgba(39,174,96,.04)">
+        <div class="num" id="s-profit" style="font-size:1.4rem;color:#27ae60">0</div>
+        <div class="lbl">ربحك الصافي (ج)</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:.6rem;font-size:.72rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase">🏦 التحصيل</div>
+    <div class="stats" style="margin-bottom:2rem">
+      <div class="stat-card" style="border-color:rgba(39,174,96,.3)">
+        <div class="num" id="s-paid" style="font-size:1.4rem;color:#27ae60">0</div>
+        <div class="lbl">تم دفعه للعملاء (ج)</div>
+      </div>
+      <div class="stat-card" style="border-color:rgba(230,126,34,.3)">
+        <div class="num" id="s-unpaid" style="font-size:1.4rem;color:#e67e22">0</div>
+        <div class="lbl">متبقي للعملاء (ج)</div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-section">
+      <h4>🔍 بحث وفلترة</h4>
+      <div class="filter-row">
+        <span>بحث:</span>
+        <input class="search-input" type="text" id="search-input" placeholder="رقم تتبع / اسم عميل / اسم مستلم..." oninput="renderTable()"/>
+      </div>
+      <div class="filter-row">
+        <span>الحالة:</span>
+        <button class="fbtn active" onclick="setFilter('status','all',this)">الكل</button>
+        <button class="fbtn" onclick="setFilter('status','جديد',this)">جديد</button>
+        <button class="fbtn" onclick="setFilter('status','جاري التجهيز',this)">جاري التجهيز</button>
+        <button class="fbtn" onclick="setFilter('status','خرج مع المندوب',this)">خرج مع المندوب</button>
+        <button class="fbtn" onclick="setFilter('status','تم التسليم',this)">تم التسليم</button>
+        <button class="fbtn" onclick="setFilter('status','رفض الاستلام',this)">رفض الاستلام</button>
+        <button class="fbtn" onclick="setFilter('status','لم يرد',this)">لم يرد</button>
+        <button class="fbtn" onclick="setFilter('status','مؤجل',this)">مؤجل</button>
+        <button class="fbtn" onclick="setFilter('status','عنوان خاطئ',this)">عنوان خاطئ</button>
+        <button class="fbtn" onclick="setFilter('status','دفع جزئي',this)">دفع جزئي</button>
+        <button class="fbtn" onclick="setFilter('status','مرتجع - مع المندوب',this)">مرتجع - مع المندوب</button>
+        <button class="fbtn" onclick="setFilter('status','مرتجع - وصل للتاجر',this)">مرتجع - وصل للتاجر</button>
+      </div>
+      <div class="filter-row">
+        <span>التاريخ:</span>
+        <button class="fbtn active" onclick="setFilter('date','all',this)">الكل</button>
+        <button class="fbtn" onclick="setFilter('date','today',this)">اليوم</button>
+        <button class="fbtn" onclick="setFilter('date','week',this)">الأسبوع</button>
+        <button class="fbtn" onclick="setFilter('date','month',this)">الشهر</button>
+        <input class="date-input" type="date" id="date-pick" onchange="setFilter('date','pick',null)"/>
+      </div>
+      <div class="filter-row">
+        <span>العميل:</span>
+        <select id="client-filter" onchange="renderTable()" style="width:auto;padding:.35rem .7rem;font-size:.78rem">
+          <option value="">كل العملاء</option>
+        </select>
+        <button class="fbtn" onclick="document.getElementById('client-filter').value='';renderTable()">مسح</button>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <div style="display:flex;gap:.8rem;align-items:center;margin-bottom:.8rem;flex-wrap:wrap">
+        <button onclick="selectAllShipments()" style="background:transparent;color:var(--muted);border:1px solid rgba(192,192,192,.2);cursor:pointer;padding:.4rem .9rem;font-family:'Cairo',sans-serif;font-size:.75rem;font-weight:600;transition:all .25s" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='rgba(192,192,192,.2)';this.style.color='var(--muted)'">☑️ تحديد الكل</button>
+        <button onclick="printSelected()" style="background:var(--gold);color:var(--black);border:none;cursor:pointer;padding:.4rem 1rem;font-family:'Cairo',sans-serif;font-size:.75rem;font-weight:700;transition:background .25s" onmouseover="this.style.background='var(--gold-lt)'" onmouseout="this.style.background='var(--gold)'">🖨️ طباعة المحدد</button>
+        <span id="selected-count" style="font-size:.75rem;color:var(--muted)">0 محدد</span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th><input type="checkbox" id="check-all" onchange="toggleAllCheck(this)" style="cursor:pointer;width:16px;height:16px"/></th>
+            <th>رقم التتبع</th>
+            <th>باركود</th>
+            <th>العميل</th>
+            <th>تحصيل</th>
+            <th>المستلم</th>
+            <th>رقم المستلم</th>
+            <th>المحتويات</th>
+            <th>من</th>
+            <th>إلى</th>
+            <th>الوزن</th>
+            <th>طريقة الدفع</th>
+            <th>نصيب العميل (ج)</th>
+            <th>تكلفة الشحن (ج)</th>
+            <th>مبلغ التحصيل (ج)</th>
+            <th>الدفع</th>
+            <th>التاريخ</th>
+            <th>الحالة</th>
+            <th>ملاحظات داخلية</th>
+            <th>بوليصة</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="table-body">
+          <tr><td colspan="21" class="no-data">⏳ جاري التحميل...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Print Area for Waybills -->
+<div id="waybill-print-area"></div>
+
+<!-- QR Modal -->
+<div id="qr-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:999;align-items:center;justify-content:center;flex-direction:column;gap:1rem">
+  <div style="background:#fff;padding:1.5rem;text-align:center;border-radius:4px">
+    <div id="qr-modal-code"></div>
+    <div id="qr-modal-num" style="font-family:'Cairo',sans-serif;font-weight:900;font-size:1.3rem;margin-top:.8rem;color:#000;letter-spacing:.1em"></div>
+    <div style="font-size:.75rem;color:#666;margin-top:.3rem">M&A Express</div>
+  </div>
+  <div style="display:flex;gap:.8rem;flex-wrap:wrap;justify-content:center">
+    <button onclick="printQR()" style="background:var(--gold);color:var(--black);border:none;cursor:pointer;padding:.7rem 1.5rem;font-family:'Cairo',sans-serif;font-size:.9rem;font-weight:700">🖨️ طباعة</button>
+    <button onclick="downloadQR()" style="background:transparent;color:var(--gold);border:1px solid var(--gold);cursor:pointer;padding:.7rem 1.5rem;font-family:'Cairo',sans-serif;font-size:.9rem;font-weight:600">⬇️ تحميل</button>
+    <button onclick="document.getElementById('qr-modal').style.display='none'" style="background:transparent;color:var(--muted);border:1px solid rgba(192,192,192,.3);cursor:pointer;padding:.7rem 1.5rem;font-family:'Cairo',sans-serif;font-size:.9rem">إغلاق</button>
+  </div>
+</div>
+
+<script>
+const SURL='https://vntetqpzmhrrxwoovwtl.supabase.co';
+const SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZudGV0cXB6bWhycnh3b292d3RsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3NTA4NjEsImV4cCI6MjA5ODMyNjg2MX0.B3fbxDjwBPewaBwYc2tVdTZ_Y6QrNcoHWQeulFuMue4';
+const h={'apikey':SKEY,'Authorization':'Bearer '+SKEY,'Content-Type':'application/json'};
+const ADMIN_PASS='MA@Express2026';
+let allShipments=[],allProfiles=[];
+let filters={status:'all',date:'all'};
+
+function togglePass(){
+  var inp=document.getElementById('admin-pass');
+  var btn=document.querySelector('.pass-toggle');
+  inp.type=inp.type==='password'?'text':'password';
+  btn.textContent=inp.type==='password'?'👁️':'🙈';
+}
+function doAdminLogin(){
+  if(document.getElementById('admin-pass').value===ADMIN_PASS){
+    document.getElementById('login-page').style.display='none';
+    document.getElementById('dash-page').style.display='flex';
+    loadAll();
+  } else {
+    document.getElementById('login-err').textContent='كلمة السر غلط';
+  }
+}
+function adminLogout(){
+  document.getElementById('login-page').style.display='flex';
+  document.getElementById('dash-page').style.display='none';
+  document.getElementById('admin-pass').value='';
+}
+function setFilter(type,val,btn){
+  filters[type]=val;
+  var rowIdx=type==='date'?2:1;
+  document.querySelectorAll('.filter-row')[rowIdx].querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderTable();
+}
+async function loadAll(){
+  var r=await fetch(SURL+'/rest/v1/shipments?order=created_at.desc&select=*',{headers:h});
+  allShipments=await r.json();
+  var r2=await fetch(SURL+'/rest/v1/customer_profiles?select=*',{headers:h});
+  allProfiles=await r2.json();
+
+  // طلبات الانضمام المعلقة
+  var pending=allProfiles.filter(p=>!p.approved);
+  var pendingSec=document.getElementById('pending-section');
+  var pendingList=document.getElementById('pending-list');
+  if(pending.length){
+    pendingSec.style.display='block';
+    pendingList.innerHTML=pending.map(p=>`
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:.8rem;border-bottom:1px solid rgba(255,255,255,.05);flex-wrap:wrap;gap:.5rem">
+        <div>
+          <div style="font-weight:700;color:var(--white);font-size:.9rem">${p.full_name}</div>
+          <div style="font-size:.75rem;color:var(--muted)">${p.phone} • ${p.default_address||'—'}</div>
+          <div style="font-size:.72rem;color:var(--muted)">${new Date(p.created_at).toLocaleDateString('ar-EG')}</div>
+        </div>
+        <div style="display:flex;gap:.6rem">
+          <button onclick="approveClient('${p.id}',true,this)" style="background:#27ae60;color:#fff;border:none;cursor:pointer;padding:.4rem 1rem;font-family:'Cairo',sans-serif;font-size:.78rem;font-weight:700;transition:opacity .2s">✓ قبول</button>
+          <button onclick="approveClient('${p.id}',false,this)" style="background:var(--red);color:#fff;border:none;cursor:pointer;padding:.4rem 1rem;font-family:'Cairo',sans-serif;font-size:.78rem;font-weight:700;transition:opacity .2s">✕ رفض</button>
+        </div>
+      </div>
+    `).join('');
+  } else {
+    pendingSec.style.display='none';
+  }
+
+  // ملء فلتر العملاء (المعتمدين فقط)
+  var approved=allProfiles.filter(p=>p.approved);
+  var sel=document.getElementById('client-filter');
+  var cur=sel.value;
+  sel.innerHTML='<option value="">كل العملاء</option>';
+  approved.forEach(p=>{
+    var o=document.createElement('option');
+    o.value=p.phone;
+    o.textContent=p.full_name;
+    sel.appendChild(o);
+  });
+  sel.value=cur;
+  // ملء قائمة العملاء في التحويلات
+  var trSel=document.getElementById('tr-client');
+  var curTr=trSel.value;
+  trSel.innerHTML='<option value="">اختر...</option>';
+  approved.forEach(p=>{
+    var o=document.createElement('option');
+    o.value=p.phone;
+    o.textContent=p.full_name;
+    trSel.appendChild(o);
+  });
+  trSel.value=curTr;
+  // تعيين تاريخ اليوم
+  var today=new Date().toISOString().slice(0,10);
+  if(!document.getElementById('tr-date').value) document.getElementById('tr-date').value=today;
+  updateStats();
+  renderTable();
+  loadComplaints();
+}
+
+async function sendTransfer(){
+  var phone=document.getElementById('tr-client').value;
+  var amount=parseFloat(document.getElementById('tr-amount').value)||0;
+  var date=document.getElementById('tr-date').value;
+  var notes=document.getElementById('tr-notes').value.trim();
+  var imageFile=document.getElementById('tr-image').files[0];
+  var msg=document.getElementById('tr-msg');
+  if(!phone||!amount||!date){
+    msg.textContent='الرجاء اختيار العميل والمبلغ والتاريخ';
+    msg.className='auth-msg err';return;
+  }
+  msg.textContent='⏳ جاري الإرسال...';msg.className='auth-msg';
+  var imageUrl=null;
+  if(imageFile){
+    var reader=new FileReader();
+    imageUrl=await new Promise(res=>{reader.onload=e=>res(e.target.result);reader.readAsDataURL(imageFile);});
+  }
+  var r=await fetch(SURL+'/rest/v1/transfers',{
+    method:'POST',headers:{...h,'Prefer':'return=minimal'},
+    body:JSON.stringify({client_phone:phone,amount,transfer_date:date,notes:notes||null,image_url:imageUrl})
+  });
+  if(r.ok){
+    msg.textContent='✓ تم إرسال التحويل بنجاح!';msg.className='auth-msg ok';
+    document.getElementById('tr-amount').value='';
+    document.getElementById('tr-notes').value='';
+    document.getElementById('tr-image').value='';
+    setTimeout(()=>msg.textContent='',3000);
+  } else {
+    msg.textContent='حدث خطأ، حاول مجدداً';msg.className='auth-msg err';
+  }
+}
+
+async function loadComplaints(){
+  var r=await fetch(SURL+'/rest/v1/complaints?order=created_at.desc&select=*',{headers:h});
+  var complaints=await r.json();
+  var sec=document.getElementById('complaints-section');
+  var list=document.getElementById('complaints-list');
+  if(!complaints.length){sec.style.display='none';return}
+  sec.style.display='block';
+  document.getElementById('complaints-count').textContent='('+complaints.length+')';
+  list.innerHTML=complaints.map(c=>`
+    <div style="border-bottom:1px solid rgba(255,255,255,.05);padding:1rem 0" id="comp-${c.id}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:.5rem;margin-bottom:.6rem">
+        <div>
+          <span style="font-weight:700;color:var(--white);font-size:.88rem">${c.customer_name||'—'}</span>
+          <span style="font-size:.72rem;color:var(--muted);margin-right:.6rem">${c.phone||''}</span>
+          ${c.tracking_number?`<span style="font-size:.72rem;color:var(--gold)">رقم تتبع: ${c.tracking_number}</span>`:''}
+        </div>
+        <div style="display:flex;align-items:center;gap:.6rem">
+          <span style="font-size:.7rem;padding:.2rem .6rem;border:1px solid;${c.status==='تم الرد'?'color:#27ae60;border-color:#27ae60':'color:#e05;border-color:#e05'}">${c.status}</span>
+          <span style="font-size:.7rem;color:var(--muted)">${new Date(c.created_at).toLocaleDateString('ar-EG')}</span>
+        </div>
+      </div>
+      <p style="font-size:.82rem;color:var(--silver);margin-bottom:.8rem;line-height:1.6">${c.complaint}</p>
+      ${c.admin_reply?`<div style="background:#0f0f0f;border-right:2px solid var(--gold);padding:.6rem .9rem;font-size:.78rem;color:var(--muted);margin-bottom:.6rem">ردك: ${c.admin_reply}</div>`:''}
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+        <input type="text" placeholder="اكتب ردك هنا..." id="reply-${c.id}"
+          style="flex:1;min-width:200px;background:#0f0f0f;border:1px solid rgba(201,168,76,.2);color:var(--white);padding:.4rem .8rem;font-family:'Cairo',sans-serif;font-size:.8rem;outline:none"/>
+        <button onclick="replyComplaint('${c.id}')" style="background:var(--gold);color:var(--black);border:none;cursor:pointer;padding:.4rem 1rem;font-family:'Cairo',sans-serif;font-size:.78rem;font-weight:700">إرسال الرد</button>
+        <button onclick="deleteComplaint('${c.id}')" style="background:transparent;color:#e05;border:1px solid rgba(192,48,43,.3);cursor:pointer;padding:.4rem .8rem;font-family:'Cairo',sans-serif;font-size:.75rem">حذف</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function replyComplaint(id){
+  var reply=document.getElementById('reply-'+id).value.trim();
+  if(!reply) return;
+  await fetch(SURL+'/rest/v1/complaints?id=eq.'+id,{
+    method:'PATCH',headers:{...h,'Prefer':'return=minimal'},
+    body:JSON.stringify({admin_reply:reply,status:'تم الرد'})
+  });
+  loadComplaints();
+}
+
+async function deleteComplaint(id){
+  if(!confirm('هل تريد حذف هذه الشكوى؟')) return;
+  await fetch(SURL+'/rest/v1/complaints?id=eq.'+id,{method:'DELETE',headers:h});
+  loadComplaints();
+}
+function updateClientTotals(){
+  var approved=allProfiles.filter(p=>p.approved);
+  if(!approved.length){document.getElementById('client-totals').style.display='none';return}
+  document.getElementById('client-totals').style.display='block';
+  var rows=approved.map(p=>{
+    var shipments=allShipments.filter(s=>s.phone===p.phone);
+    if(!shipments.length) return '';
+        var totalRev=shipments.reduce((a,s)=>a+(parseFloat(s.client_amount)||0),0);
+    var totalClient=shipments.reduce((a,s)=>a+(parseFloat(s.price)||0),0);
+    var totalShipping=shipments.reduce((a,s)=>a+((parseFloat(s.client_amount)||0)-(parseFloat(s.price)||0)),0);
+    var totalPaid=shipments.filter(s=>s.payment_status==='تم الدفع').reduce((a,s)=>a+(parseFloat(s.price)||0),0);
+    var remaining=totalClient-totalPaid;
+    return `<tr style="border-bottom:1px solid rgba(255,255,255,.04)">
+      <td style="padding:.6rem;font-weight:700;color:var(--white)">${p.full_name}</td>
+      <td style="padding:.6rem;color:var(--muted);text-align:center">${shipments.length}</td>
+      <td style="padding:.6rem;color:var(--gold)">${totalRev.toLocaleString('ar-EG')}</td>
+      <td style="padding:.6rem;color:var(--muted)">${totalShipping.toLocaleString('ar-EG')}</td>
+      <td style="padding:.6rem;color:#27ae60">${totalClient.toLocaleString('ar-EG')}</td>
+      <td style="padding:.6rem;color:#27ae60">${totalPaid.toLocaleString('ar-EG')}</td>
+      <td style="padding:.6rem;color:#e05;font-weight:700">${remaining.toLocaleString('ar-EG')}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('client-totals-body').innerHTML=rows||'<tr><td colspan="7" style="padding:1rem;text-align:center;color:var(--muted)">لا توجد بيانات</td></tr>';
+}
+
+var finFilter='all';
+function setFinFilter(f,btn){
+  finFilter=f;
+  document.querySelectorAll('#fin-all,#fin-today,#fin-week,#fin-month').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  updateStats();
+}
+
+function filterByDate(list){
+  var now=new Date();
+  var datePick=document.getElementById('fin-date').value;
+  return list.filter(s=>{
+    var d=new Date(s.created_at);
+    if(finFilter==='today') return d.toDateString()===now.toDateString();
+    if(finFilter==='week') return (now-d)/(1000*60*60*24)<=7;
+    if(finFilter==='month') return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();
+    if(finFilter==='pick'&&datePick) return d.toISOString().slice(0,10)===datePick;
+    return true;
+  });
+}
+
+function updateStats(){
+  document.getElementById('s-all').textContent=allShipments.length;
+  document.getElementById('s-new').textContent=allShipments.filter(s=>s.status==='جديد').length;
+  document.getElementById('s-prep').textContent=allShipments.filter(s=>s.status==='جاري التجهيز').length;
+  document.getElementById('s-way').textContent=allShipments.filter(s=>s.status==='خرج مع المندوب').length;
+  document.getElementById('s-done').textContent=allShipments.filter(s=>s.status==='تم التسليم').length;
+  document.getElementById('s-rejected').textContent=allShipments.filter(s=>s.status==='رفض الاستلام'||s.status==='لم يرد').length;
+  document.getElementById('s-return').textContent=allShipments.filter(s=>s.status&&s.status.includes('مرتجع')).length;
+  document.getElementById('total-count').textContent=allShipments.length;
+  // تطبيق فلتر التاريخ على الإحصائيات المالية
+  var filtered=filterByDate(allShipments);
+    var rev=filtered.reduce((a,s)=>a+(parseFloat(s.client_amount)||0),0);
+  var clientsTotal=filtered.reduce((a,s)=>a+(parseFloat(s.price)||0),0);
+  var profit=filtered.reduce((a,s)=>a+((parseFloat(s.client_amount)||0)-(parseFloat(s.price)||0)),0);
+  var paid=filtered.filter(s=>s.payment_status==='تم الدفع').reduce((a,s)=>a+(parseFloat(s.price)||0),0);
+  var unpaid=clientsTotal-paid;
+  document.getElementById('s-revenue').textContent=rev.toLocaleString('ar-EG');
+  document.getElementById('s-clients-total').textContent=clientsTotal.toLocaleString('ar-EG');
+  document.getElementById('s-profit').textContent=profit.toLocaleString('ar-EG');
+  document.getElementById('s-paid').textContent=paid.toLocaleString('ar-EG');
+  document.getElementById('s-unpaid').textContent=unpaid.toLocaleString('ar-EG');
+  updateClientTotals();
+}
+function getClientName(phone){
+  var p=allProfiles.find(x=>x.phone===phone);
+  return p?(p.company_name||p.full_name):'—';
+}
+function getClientPayment(phone){
+  var p=allProfiles.find(x=>x.phone===phone);
+  if(!p) return '—';
+  var parts=[];
+  if(p.wallet_type&&p.wallet_number) parts.push(p.wallet_type+': '+p.wallet_number);
+  if(p.bank_name&&p.bank_account) parts.push(p.bank_name+': '+p.bank_account);
+  return parts.length?parts.join(' | '):'—';
+}
+function renderTable(){
+  var search=(document.getElementById('search-input').value||'').trim().toLowerCase();
+  var clientPhone=document.getElementById('client-filter').value;
+  var datePick=document.getElementById('date-pick').value;
+  var now=new Date();
+  var list=allShipments.filter(s=>{
+    if(filters.status!=='all'&&s.status!==filters.status) return false;
+    if(clientPhone&&s.phone!==clientPhone) return false;
+    if(search){
+      var cn=getClientName(s.phone).toLowerCase();
+      if(!(s.tracking_number||'').toLowerCase().includes(search)&&
+         !(s.customer_name||'').toLowerCase().includes(search)&&
+         !cn.includes(search)) return false;
+    }
+    var d=new Date(s.created_at);
+    if(filters.date==='today'&&d.toDateString()!==now.toDateString()) return false;
+    if(filters.date==='week'&&(now-d)/(1000*60*60*24)>7) return false;
+    if(filters.date==='month'&&(d.getMonth()!==now.getMonth()||d.getFullYear()!==now.getFullYear())) return false;
+    if(filters.date==='pick'&&datePick&&d.toISOString().slice(0,10)!==datePick) return false;
+    return true;
+  });
+  if(!list.length){
+    document.getElementById('table-body').innerHTML='<tr><td colspan="21" class="no-data">لا توجد شحنات مطابقة</td></tr>';
+    return;
+  }
+  var statuses=[['جديد','🆕 جديد'],['جاري التجهيز','⚙️ جاري التجهيز'],['خرج مع المندوب','🚚 خرج مع المندوب'],['تم التسليم','✅ تم التسليم'],['رفض الاستلام','❌ رفض الاستلام'],['لم يرد','📞 لم يرد'],['مؤجل','⏳ مؤجل'],['عنوان خاطئ','📍 عنوان خاطئ'],['دفع جزئي','💵 دفع جزئي'],['مرتجع - مع المندوب','🔄 مرتجع - مع المندوب'],['مرتجع - وصل للتاجر','🔄 مرتجع - وصل للتاجر']];
+  var statusColors={
+    'جديد':'#9b59b6',
+    'جاري التجهيز':'#e67e22',
+    'خرج مع المندوب':'#3498db',
+    'تم التسليم':'#27ae60',
+    'رفض الاستلام':'#e74c3c',
+    'لم يرد':'#e74c3c',
+    'مؤجل':'#f39c12',
+    'عنوان خاطئ':'#c0392b',
+    'دفع جزئي':'#e67e22',
+    'مرتجع - مع المندوب':'#8e44ad',
+    'مرتجع - وصل للتاجر':'#2c3e50'
+  };
+  document.getElementById('table-body').innerHTML=list.map(s=>`
+    <tr>
+      <td><input type="checkbox" class="ship-check" value="${s.id}" onchange="updateSelectedCount()" style="cursor:pointer;width:16px;height:16px"/></td>
+      <td><span class="tn">${s.tracking_number||'—'}</span></td>
+      <td>
+        <div id="qr-${s.id}" style="width:60px;height:60px;cursor:pointer" onclick="showQR('${s.tracking_number}','${s.id}')" title="اضغط لتكبير الباركود"></div>
+      </td>
+      <td><span class="client-name">${getClientName(s.phone)}</span></td>
+      <td style="font-size:.7rem;color:#f0a500;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${getClientPayment(s.phone)}">${getClientPayment(s.phone)}</td>
+      <td>${s.customer_name||'—'}</td>
+      <td style="font-size:.72rem;color:var(--muted)">${s.receiver_phone||'—'}</td>
+      <td style="font-size:.72rem;color:var(--silver);max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${s.contents||''}">${s.contents||'—'}</td>
+      <td><div class="addr" title="${s.from_address||''}">${s.from_address||'—'}</div></td>
+      <td><div class="addr" title="${s.to_address||''}">${s.to_address||'—'}</div></td>
+      <td style="font-size:.72rem;color:var(--muted)">${(s.notes||'').split('|')[0].trim()||'—'}</td>
+      <td style="font-size:.72rem;color:var(--gold)">${(s.notes||'').split('|')[1]?s.notes.split('|')[1].replace('دفع:','').trim():'—'}</td>
+      <td><input class="num-input" type="number" value="${s.price||0}" min="0" step="1" onchange="updateField('${s.id}','price',this.value,this)" title="نصيب العميل = سعر البضاعة"/></td>
+      <td style="font-size:.78rem;color:var(--muted);text-align:center" title="تكلفة الشحن = مبلغ التحصيل - نصيب العميل">${((parseFloat(s.client_amount)||0)-(parseFloat(s.price)||0)).toLocaleString('ar-EG')}</td>
+      <td><input class="num-input" type="number" value="${s.client_amount||0}" min="0" step="1" style="border-color:rgba(39,174,96,.3);color:#27ae60" onchange="updateField('${s.id}','client_amount',this.value,this)" title="مبلغ التحصيل الإجمالي"/></td>
+      <td>
+        <select class="status-select" onchange="updateField('${s.id}','payment_status',this.value,this)">
+          <option value="لم يتم الدفع" ${(s.payment_status||'لم يتم الدفع')==='لم يتم الدفع'?'selected':''}>لم يتم</option>
+          <option value="تم الدفع" ${s.payment_status==='تم الدفع'?'selected':''}>تم الدفع</option>
+        </select>
+      </td>
+      <td style="white-space:nowrap;font-size:.7rem;color:var(--muted)">${new Date(s.created_at).toLocaleDateString('ar-EG')}</td>
+      <td>
+        <select class="status-select" onchange="updateStatus('${s.id}',this.value,this)" style="color:${statusColors[s.status]||'#fff'};border-color:${statusColors[s.status]||'rgba(201,168,76,.2)'}">
+          ${statuses.map(([v,l])=>`<option value="${v}" ${s.status===v?'selected':''}>${l}</option>`).join('')}
+        </select>
+      </td>
+      <td><input class="text-input" type="text" value="${s.internal_notes||''}" placeholder="ملاحظة..." onchange="updateField('${s.id}','internal_notes',this.value,this)"/></td>
+      <td>
+        <button onclick="printWaybills([allShipments.find(x=>x.id==='${s.id}')])" style="background:transparent;color:var(--gold);border:1px solid rgba(201,168,76,.3);cursor:pointer;padding:.3rem .6rem;font-family:'Cairo',sans-serif;font-size:.72rem;white-space:nowrap;transition:all .2s" onmouseover="this.style.background='rgba(201,168,76,.1)'" onmouseout="this.style.background='transparent'">🖨️ بوليصة</button>
+      </td>
+      <td><span class="saved-flash" id="flash-${s.id}">✓</span></td>
+    </tr>
+  `).join('');
+  generateAllQRCodes(list);
+}
+async function updateStatus(id,newStatus,select){
+  var s=allShipments.find(x=>x.id===id);
+  // رفض الاستلام — اسأل عن السبب
+  if(newStatus==='رفض الاستلام'){
+    var reasons=['رفض بدون سبب','غير رأيه','المنتج غير مطابق','السعر غير مناسب','سبب آخر'];
+    var reason=prompt('سبب الرفض:\n1. رفض بدون سبب\n2. غير رأيه\n3. المنتج غير مطابق\n4. السعر غير مناسب\n5. سبب آخر\n\nاكتب رقم السبب:');
+    if(reason===null){select.value=s?.status||'جديد';return}
+    var idx=parseInt(reason);
+    var finalReason=idx>=1&&idx<=5?reasons[idx-1]:reason;
+    await fetch(SURL+'/rest/v1/shipments?id=eq.'+id,{method:'PATCH',headers:{...h,'Prefer':'return=minimal'},body:JSON.stringify({rejection_reason:finalReason})});
+  }
+  // دفع جزئي — اسأل عن المبلغ
+  if(newStatus==='دفع جزئي'){
+    var total=parseFloat(s?.client_amount||0);
+    var paid=prompt('المطلوب: '+total+' ج\nكم دفع المستلم؟');
+    if(paid===null){select.value=s?.status||'جديد';return}
+    var paidNum=parseFloat(paid)||0;
+    var remaining=total-paidNum;
+    await fetch(SURL+'/rest/v1/shipments?id=eq.'+id,{method:'PATCH',headers:{...h,'Prefer':'return=minimal'},body:JSON.stringify({partial_paid:paidNum,partial_remaining:remaining})});
+  }
+  select.disabled=true;
+  var r=await fetch(SURL+'/rest/v1/shipments?id=eq.'+id,{method:'PATCH',headers:{...h,'Prefer':'return=minimal'},body:JSON.stringify({status:newStatus})});
+  select.disabled=false;
+  if(r.ok){
+    if(s) s.status=newStatus;
+    // تم التسليم → حدّث حالة الدفع تلقائياً
+    if(newStatus==='تم التسليم'){
+      await fetch(SURL+'/rest/v1/shipments?id=eq.'+id,{method:'PATCH',headers:{...h,'Prefer':'return=minimal'},body:JSON.stringify({payment_status:'تم الدفع'})});
+      if(s) s.payment_status='تم الدفع';
+    }
+    sendNotification('تحديث شحنتك — M&A Express','شحنتك رقم '+(s?.tracking_number||'')+' — '+newStatus,s?.phone||'');
+    updateStats();
+    flash(id);
+  }
+}
+
+async function sendNotification(title, message, phone){
+  try {
+    await fetch('https://api.onesignal.com/notifications',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization':'Key os_v2_app_ioudvkwwnjctzhd3f6peqxxkiffzfwai3pxemivvxczwrus2kov7jqczcrcpjkxa2ylk5tufm6pgdbjtcfdmgowm2tsgwsdhpu7i6ai'
+      },
+      body:JSON.stringify({
+        app_id:'43a83aaa-d66a-453c-9c7b-2f9e485eea41',
+        headings:{ar:title, en:title},
+        contents:{ar:message, en:message},
+        filters:[{field:'tag',key:'phone',relation:'=',value:phone}]
+      })
+    });
+  } catch(e){ console.log('notification error',e); }
+}
+async function updateField(id,field,value,el){
+  var body={};
+  body[field]=(field==='price'||field==='client_amount')?parseFloat(value)||0:value;
+  el.disabled=true;
+  var r=await fetch(SURL+'/rest/v1/shipments?id=eq.'+id,{method:'PATCH',headers:{...h,'Prefer':'return=minimal'},body:JSON.stringify(body)});
+  el.disabled=false;
+  if(r.ok){var s=allShipments.find(x=>x.id===id);if(s)s[field]=body[field];updateStats();flash(id);}
+}
+async function approveClient(id, approve, btn){
+  btn.disabled=true;
+  if(approve){
+    // قبول — تحديث approved = true
+    var r=await fetch(SURL+'/rest/v1/customer_profiles?id=eq.'+id,{
+      method:'PATCH',headers:{...h,'Prefer':'return=minimal'},
+      body:JSON.stringify({approved:true})
+    });
+    if(r.ok){ btn.closest('div[style]').remove(); loadAll(); }
+  } else {
+    // رفض — حذف الـ profile
+    var r=await fetch(SURL+'/rest/v1/customer_profiles?id=eq.'+id,{
+      method:'DELETE',headers:h
+    });
+    if(r.ok){ btn.closest('div[style]').remove(); loadAll(); }
+  }
+  btn.disabled=false;
+}
+
+var currentQRNum='';
+function showQR(trackingNum, id){
+  currentQRNum=trackingNum;
+  var modal=document.getElementById('qr-modal');
+  modal.style.display='flex';
+  document.getElementById('qr-modal-num').textContent=trackingNum;
+  document.getElementById('qr-modal-code').innerHTML='';
+  new QRCode(document.getElementById('qr-modal-code'),{
+    text:'https://m-a-express.vercel.app/courier.html?tn='+trackingNum,
+    width:220,height:220,
+    colorDark:'#000000',colorLight:'#ffffff',
+    correctLevel:QRCode.CorrectLevel.H
+  });
+}
+function downloadQR(){
+  setTimeout(()=>{
+    var canvas=document.querySelector('#qr-modal-code canvas');
+    if(!canvas) return;
+    var link=document.createElement('a');
+    link.download='QR-'+currentQRNum+'.png';
+    link.href=canvas.toDataURL('image/png');
+    link.click();
+  },100);
+}
+function printQR(){
+  var canvas=document.querySelector('#qr-modal-code canvas');
+  if(!canvas) return;
+  var win=window.open('','_blank');
+  win.document.write(`<html><head><title>QR - ${currentQRNum}</title>
+    <style>body{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:Arial;text-align:center}
+    h2{margin-bottom:1rem;font-size:1.8rem;font-weight:900} p{color:#666;margin-top:.5rem}</style></head>
+    <body><h2>${currentQRNum}</h2>
+    <img src="${canvas.toDataURL()}" style="width:220px;height:220px"/>
+    <p>M&A Express</p>
+    <script>window.onload=()=>window.print()<\/script></body></html>`);
+  win.document.close();
+}
+function generateAllQRCodes(list){
+  setTimeout(()=>{
+    list.forEach(s=>{
+      var el=document.getElementById('qr-'+s.id);
+      if(el&&el.innerHTML===''){
+        new QRCode(el,{
+          text:'https://m-a-express.vercel.app/courier.html?tn='+s.tracking_number,
+          width:60,height:60,
+          colorDark:'#000000',colorLight:'#ffffff',
+          correctLevel:QRCode.CorrectLevel.L
+        });
+      }
+    });
+  },300);
+}
+
+// ── CHECKBOX ──
+function toggleAllCheck(cb){
+  document.querySelectorAll('.ship-check').forEach(c=>c.checked=cb.checked);
+  updateSelectedCount();
+}
+function updateSelectedCount(){
+  var n=document.querySelectorAll('.ship-check:checked').length;
+  document.getElementById('selected-count').textContent=n+' محدد';
+}
+function selectAllShipments(){
+  var checks=document.querySelectorAll('.ship-check');
+  var allChecked=[...checks].every(c=>c.checked);
+  checks.forEach(c=>c.checked=!allChecked);
+  updateSelectedCount();
+}
+function printSelected(){
+  var ids=[...document.querySelectorAll('.ship-check:checked')].map(c=>c.value);
+  if(!ids.length){alert('الرجاء تحديد شحنة واحدة على الأقل');return}
+  printWaybills(ids.map(id=>allShipments.find(s=>s.id===id)).filter(Boolean));
+}
+
+// ── WAYBILL ENGINE ──
+function buildWaybillHTML(s){
+  var profile=allProfiles.find(p=>p.phone===s.phone)||{};
+  var companyName=profile.company_name||profile.full_name||'—';
+  var logoUrl=profile.logo_url||'';
+  var collection=parseFloat(s.client_amount||0);
+  var date=new Date(s.created_at).toLocaleDateString('ar-EG');
+  var tn=s.tracking_number||'';
+  return `
+  <div class="wb-page">
+    <div class="wb-header">
+      <div>
+        <div class="wb-brand">M<span>&amp;</span>A <span>EXPRESS</span></div>
+        <div style="font-size:5.5pt;color:#888;letter-spacing:.1em">نوصّل الثقة</div>
+      </div>
+      <div class="wb-qr" id="wb-qr-${tn}"></div>
+    </div>
+    <div class="wb-sender">
+      ${logoUrl?`<img src="${logoUrl}" style="max-height:12mm;max-width:30mm;object-fit:contain;display:block;margin:0 auto 1mm" alt=""/>` : ''}
+      <div class="wb-sender-name">${companyName}</div>
+      <div style="font-size:6pt;color:#888;margin-top:.5mm">المرسِل</div>
+    </div>
+    <div class="wb-tn-row">
+      <div style="font-size:6pt;color:#888;letter-spacing:.08em;margin-bottom:.5mm">رقم الشحنة</div>
+      <div class="wb-tn-num">${tn}</div>
+      <svg id="wb-bc-${tn}" style="width:100%;height:10mm;display:block;margin-top:1mm;background:#fff"></svg>
+    </div>
+    <div class="wb-box" style="margin-bottom:2mm"><div class="wb-lbl">📍 عنوان التسليم</div><div class="wb-val">${s.to_address||'—'}</div></div>
+    <div class="wb-receiver">
+      <div class="wb-lbl">👤 المستلم</div>
+      <div style="font-size:11pt;font-weight:900;color:#fff;margin:.5mm 0">${s.customer_name||'—'}</div>
+      <div style="font-size:8.5pt;color:#C9A84C;font-weight:700">${s.receiver_phone||'—'}</div>
+    </div>
+    ${s.contents?`<div class="wb-contents">📦 ${s.contents}${s.notes?' • '+s.notes:''}</div>`:''}
+    <div class="wb-collection">
+      <div style="font-size:6pt;color:#000;font-weight:700;letter-spacing:.08em;margin-bottom:.5mm">💰 مبلغ التحصيل</div>
+      <div style="font-size:16pt;font-weight:900;color:#000">${collection>0?collection.toLocaleString('ar-EG')+' جنيه':'مدفوع مسبقاً'}</div>
+    </div>
+    <div class="wb-footer">
+      <span>تاريخ الطباعة: ${date}</span>
+      <span>m-a-express.vercel.app</span>
+    </div>
+  </div>`;
+}
+
+function printWaybills(shipments){
+  if(!shipments||!shipments.length) return;
+  var area=document.getElementById('waybill-print-area');
+  area.innerHTML=`<style>
+    #waybill-print-area{font-family:Arial,sans-serif;direction:rtl;background:#fff}
+    .wb-page{width:105mm;min-height:148mm;padding:4mm;background:#0a0a0a;color:#fff;box-sizing:border-box;page-break-after:always;border:1.5px solid #C9A84C;display:inline-block}
+    .wb-header{display:flex;justify-content:space-between;align-items:center;border-bottom:1.5px solid #C9A84C;padding-bottom:3mm;margin-bottom:3mm}
+    .wb-brand{font-size:13pt;font-weight:900;color:#C9A84C;line-height:1}
+    .wb-brand span{color:#aaa}
+    .wb-qr{width:18mm;height:18mm;background:#fff;padding:1mm;flex-shrink:0}
+    .wb-qr canvas,.wb-qr img{width:100%!important;height:100%!important}
+    .wb-sender{text-align:center;background:#161616;border:1px solid #C9A84C;padding:2.5mm;margin-bottom:2.5mm}
+    .wb-sender-name{font-size:13pt;font-weight:900;color:#C9A84C}
+    .wb-tn-row{text-align:center;background:#161616;border:1px solid rgba(201,168,76,.3);padding:2mm;margin-bottom:2.5mm}
+    .wb-tn-num{font-size:20pt;font-weight:900;color:#C9A84C;letter-spacing:.1em;line-height:1}
+    .wb-grid{display:grid;grid-template-columns:1fr 1fr;gap:2mm;margin-bottom:2mm}
+    .wb-box{background:#161616;border:1px solid rgba(201,168,76,.2);padding:1.5mm}
+    .wb-lbl{font-size:5.5pt;color:#C9A84C;margin-bottom:.5mm;font-weight:700}
+    .wb-val{font-size:7pt;color:#fff;font-weight:700;line-height:1.3}
+    .wb-receiver{background:#161616;border:1px solid rgba(201,168,76,.3);padding:2mm;margin-bottom:2mm}
+    .wb-contents{font-size:6.5pt;color:#aaa;margin-bottom:2mm;padding:1.5mm;border:1px dashed rgba(201,168,76,.2)}
+    .wb-collection{background:#C9A84C;padding:2.5mm;text-align:center;margin-bottom:2mm}
+    .wb-footer{display:flex;justify-content:space-between;font-size:5.5pt;color:#666;border-top:1px solid rgba(201,168,76,.2);padding-top:1.5mm}
+    @media print{
+      @page{size:A6 portrait;margin:0}
+      body>*:not(#waybill-print-area){display:none!important}
+      #waybill-print-area{display:block!important;background:#fff}
+      .wb-page{width:105mm;min-height:148mm;page-break-after:always}
+    }
+  </style>${shipments.map(s=>buildWaybillHTML(s)).join('')}`;
+
+  // توليد QR و Barcode
+  shipments.forEach(s=>{
+    var tn=s.tracking_number||'';
+    var qrEl=area.querySelector('#wb-qr-'+tn);
+    if(qrEl) new QRCode(qrEl,{
+      text:'https://m-a-express.vercel.app/courier.html?tn='+tn,
+      width:64,height:64,colorDark:'#000',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.H
+    });
+    var bcEl=area.querySelector('#wb-bc-'+tn);
+    if(bcEl&&tn&&typeof JsBarcode!=='undefined'){
+      try{JsBarcode(bcEl,tn,{format:'CODE128',width:1.5,height:30,displayValue:false,background:'#fff',lineColor:'#000',margin:2});}catch(e){}
+    }
+  });
+  setTimeout(()=>window.print(),900);
+}
+
+function flash(id){
+  var f=document.getElementById('flash-'+id);
+  if(f){f.classList.add('show');setTimeout(()=>f.classList.remove('show'),2000);}
+}
+</script>
+</body>
+</html>
