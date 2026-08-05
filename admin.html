@@ -715,11 +715,10 @@ async function updateStatus(id,newStatus,select){
 
 async function sendNotification(title, message, phone){
   try {
-    await fetch('https://api.onesignal.com/notifications',{
+    await fetch('/api/send-notification',{
       method:'POST',
       headers:{
         'Content-Type':'application/json',
-        'Authorization':'Key os_v2_app_ioudvkwwnjctzhd3f6peqxxkiffzfwai3pxemivvxczwrus2kov7jqczcrcpjkxa2ylk5tufm6pgdbjtcfdmgowm2tsgwsdhpu7i6ai'
       },
       body:JSON.stringify({
         app_id:'43a83aaa-d66a-453c-9c7b-2f9e485eea41',
