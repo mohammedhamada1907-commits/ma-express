@@ -8,7 +8,7 @@ export default async function handler(req, res) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Key os_v2_app_ioudvkwwnjctzhd3f6peqxxkigaycgp63cwevpmwwsnt4ldp57u32yzuwwhvjmxk243ztnzxovk7rfbmpw364pgiyuc3stpxk3loeiy"
+        "Authorization": "Key ${process.env.ONESIGNAL_API_KEY}"
       },
       body: JSON.stringify(req.body)
     });
