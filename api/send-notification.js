@@ -15,9 +15,12 @@ export default async function handler(req, res) {
 
     const text = await response.text();
 
+console.log("OneSignal Status:", response.status);
+console.log("OneSignal Response:", text);
+
 return res.status(response.status).json({
   status: response.status,
-  response: text
+  body: text
 });
   } catch (e) {
     return res.status(500).json({ error: e.message });
