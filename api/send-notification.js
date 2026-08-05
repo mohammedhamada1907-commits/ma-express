@@ -7,8 +7,11 @@ export default async function handler(req, res) {
     const response = await fetch(""https://api.onesignal.com/apps"", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Key ${process.env.ONESIGNAL_API_KEY}"
+        headers: {
+  "accept": "application/json",
+  "content-type": "application/json",
+  "Authorization": `Key ${process.env.ONESIGNAL_API_KEY}`
+}
       },
       body: JSON.stringify(req.body)
     });
