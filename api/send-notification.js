@@ -8,14 +8,17 @@ export default async function handler(req, res) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Basic os_v2_app_ioudvkwwnjctzhd3f6peqxxkigaycgp63cwevpmwwsnt4ldp57u32yzuwwhvjmxk243ztnzxovk7rfbmpw364pgiyuc3stpxk3loeiy"
+        "Authorization": "Key os_v2_app_ioudvkwwnjctzhd3f6peqxxkigaycgp63cwevpmwwsnt4ldp57u32yzuwwhvjmxk243ztnzxovk7rfbmpw364pgiyuc3stpxk3loeiy"
       },
       body: JSON.stringify(req.body)
     });
 
-    const data = await response.json();
+    const text = await response.text();
 
-    return res.status(response.status).json(data);
+return res.status(response.status).json({
+  status: response.status,
+  response: text
+});
   } catch (e) {
     return res.status(500).json({ error: e.message });
   }
