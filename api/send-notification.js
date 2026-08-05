@@ -8,7 +8,7 @@ export default async function handler(req, res) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "aycgp63cwevpmwwsnt4ldp57u"
+        "Authorization": "Key aycgp63cwevpmwwsnt4ldp57u"
       },
       body: JSON.stringify(req.body)
     });
