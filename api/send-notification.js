@@ -4,23 +4,25 @@ export default async function handler(req, res) {
   }
 
   try {
-    // للتأكد إن Vercel شايف الـ Environment Variable
-    console.log("ONESIGNAL_API_KEY =", process.env.ONESIGNAL_API_KEY);
+    const apiKey = process.env.ONESIGNAL_API_KEY;
+
+    if (!apiKey) {
+      return res.status(500).json({
+        error: "ONESIGNAL_API_KEY is missing"
+      });
+    }
 
     const response = await fetch("https://api.onesignal.com/notifications", {
       method: "POST",
       headers: {
         "Accept": "application/json",
         "Content-Type": "application/json",
-        "Authorization": `Key ${process.env.ONESIGNAL_API_KEY}`
+        "Authorization": `Key ${apiKey}`
       },
       body: JSON.stringify(req.body)
     });
 
     const text = await response.text();
-
-    console.log("OneSignal Status:", response.status);
-    console.log("OneSignal Response:", text);
 
     return res.status(response.status).json({
       status: response.status,
@@ -28,8 +30,6 @@ export default async function handler(req, res) {
     });
 
   } catch (e) {
-    console.error("Server Error:", e);
-
     return res.status(500).json({
       error: e.message
     });
