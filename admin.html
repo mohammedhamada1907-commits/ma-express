@@ -713,22 +713,42 @@ async function updateStatus(id,newStatus,select){
   }
 }
 
-async function sendNotification(title, message, phone){
+async function sendNotification(title, message, phone) {
   try {
-    await fetch('https://api.onesignal.com/notifications',{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'Authorization':'Key os_v2_app_ioudvkwwnjctzhd3f6peqxxkiffzfwai3pxemivvxczwrus2kov7jqczcrcpjkxa2ylk5tufm6pgdbjtcfdmgowm2tsgwsdhpu7i6ai'
+    const response = await fetch('/api/send-notification', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
       },
-      body:JSON.stringify({
-        app_id:'43a83aaa-d66a-453c-9c7b-2f9e485eea41',
-        headings:{ar:title, en:title},
-        contents:{ar:message, en:message},
-        filters:[{field:'tag',key:'phone',relation:'=',value:phone}]
+      body: JSON.stringify({
+        app_id: '43a83aaa-d66a-453c-9c7b-2f9e485eea41',
+        target_channel: 'push',
+        headings: {
+          ar: title,
+          en: title
+        },
+        contents: {
+          ar: message,
+          en: message
+        },
+        filters: [
+          {
+            field: 'tag',
+            key: 'phone',
+            relation: '=',
+            value: phone
+          }
+        ]
       })
     });
-  } catch(e){ console.log('notification error',e); }
+
+    const data = await response.json();
+
+    console.log('Notification response:', data);
+
+  } catch (e) {
+    console.log('notification error', e);
+  }
 }
 async function updateField(id,field,value,el){
   var body={};
